@@ -91,5 +91,5 @@
 
 (defn ground-relevant-predicates [domprob]
   (let [actions (((domprob :PDDLDomain) :grounding) :actions)
-        atoms (map extract-all-atoms actions)]
-    (set (remove nil? (flatten atoms)))))
+        atoms (map extract-all-atoms actions)] 
+    (distinct (remove nil? (flatten atoms)))))
