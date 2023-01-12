@@ -1,4 +1,4 @@
-(defproject org.clojars.existenzquantor/pddl-parse-and-ground "0.1.2"
+(defproject org.clojars.existenzquantor/pddl-parse-and-ground "0.1.3"
   :description "A Parser and Grounder for PDDL files"
   :url "https://github.com/existenzquantor/pddl_parse_and_ground"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
