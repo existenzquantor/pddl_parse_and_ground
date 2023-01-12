@@ -19,11 +19,11 @@
     (if (in? vars '-)
       (let [var (first vars)
             type (first (rest (rest vars)))]
-        (symbols->map (rest (rest (rest vars))) (concat return (list {:symbol var :type type}))))
+        (symbols->map (rest (rest (rest vars))) (concat return (list {:symbol var :sort 'var :type type}))))
       (let [var (first vars)]
         (if (and (symbol? var) (not (= '\? (get (str var) 0))))
-          (symbols->map (rest vars) (conj return {:variable var :type 'const}))
-        (symbols->map (rest vars) (concat return (list {:variable var :type 'variable}))))))))
+          (symbols->map (rest vars) (conj return {:symbol var :sort 'const :type nil}))
+        (symbols->map (rest vars) (concat return (list {:symbol var :sort 'var :type nil}))))))))
 
 ; Parse Predicates
 (defn make-predicate [pred]
@@ -95,7 +95,7 @@
     return
     (if (= '- (first objects))
       (get-problem-objects-recur (rest (rest objects)) return)
-      (get-problem-objects-recur (rest objects) (conj return {':object (first objects) ':type (lookup-type (first objects) objects)})))))
+      (get-problem-objects-recur (rest objects) (conj return {:symbol (first objects) :sort 'const :type (lookup-type (first objects) objects)})))))
 
 (defn get-problem-objects [problem]
   (if (empty? problem)

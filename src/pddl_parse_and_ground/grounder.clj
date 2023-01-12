@@ -12,9 +12,9 @@
 (defn substitute-match [pairs param]
   (let [pair (first pairs)]
     (cond
-      (empty? pairs) nil
-      (= (param :type) 'const) param
-      (= ((first pair) :symbol) (param :variable)) (second pair)
+      (empty? pairs) param
+      (= (param :sort) 'const) param
+      (= ((first pair) :symbol) (param :symbol)) (second pair)
       :else (substitute-match (rest pairs) param))))
 
 (defn substitute-all-params [pairs params]
@@ -83,7 +83,7 @@
   (cond
     (empty? formula) nil
     (= 'and (formula :operator)) (map extract-atoms (formula :conjuncts))
-    (= 'not (formula :operator)) (formula ::atom)
+    (= 'not (formula :operator)) (formula :atom)
     :else formula))
 
 (defn extract-all-atoms [action]
