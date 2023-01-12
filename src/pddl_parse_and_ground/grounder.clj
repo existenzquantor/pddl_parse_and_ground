@@ -78,3 +78,18 @@
   (flatten (ground-actions
             (((first domprob) :PDDLProblem) :objects)
             (((first domprob) :PDDLDomain) :actions))))
+
+(defn extract-atoms [formula]
+  (cond
+    (empty? formula) nil
+    (= 'and (formula :operator)) (map extract-atoms (formula :conjuncts))
+    (= 'not (formula :operator)) (formula ::atom)
+    :else formula))
+
+(defn extract-all-atoms [action]
+  (concat (extract-atoms ((action :action) :precondition)) (extract-atoms ((action :action) :effect))))
+
+(defn ground-relevant-predicates [domprob]
+  (let [actions (((domprob :PDDLDomain) :grounding) :actions)
+        atoms (map extract-all-atoms actions)]
+    (set (remove nil? (flatten atoms)))))
