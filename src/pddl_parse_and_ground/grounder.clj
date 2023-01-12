@@ -76,8 +76,8 @@
 
 (defn ground-all-actions [domprob]
   (flatten (ground-actions
-            (((first domprob) :PDDLProblem) :objects)
-            (((first domprob) :PDDLDomain) :actions))))
+            ((domprob :PDDLProblem) :objects)
+            ((domprob :PDDLDomain) :actions))))
 
 (defn extract-atoms [formula]
   (cond
