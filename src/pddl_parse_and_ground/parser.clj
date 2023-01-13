@@ -8,8 +8,7 @@
       (second (first domain))
       (get-domain-name (rest domain)))))
 
-(defn in?
-  [coll elm]
+(defn in? [coll elm]
   (some #(= elm %) coll))
 
 (defn symbols->map [vars return] 
@@ -134,7 +133,7 @@
       (set-param-type (rest objects) param))))
 
 (defn set-type-in-list [objects atom]
-  (map (partial set-param-type objects) (get-in atom [:params])))
+  (assoc-in atom [:params] (map (partial set-param-type objects) (get-in atom [:params]))))
 
 (defn set-type-in-formula [objects formula]
   (cond
@@ -153,6 +152,7 @@
   (let [objects (get-in domprob [:PDDLProblem :objects])
         problem (get-in domprob [:PDDLProblem])
         domain (get-in domprob [:PDDLDomain])]
+    (println "(get-in problem [:init])): " (get-in problem [:init]))
     {:PDDLDomain {:name (get-in domain [:name])
                   :predicates (get-in domain [:predicates])
                   :actions (map (partial infer-types-in-actions objects) (get-in domain [:actions]))
