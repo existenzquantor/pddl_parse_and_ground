@@ -132,11 +132,12 @@
       (assoc-in param [:type] (get-in object [:type]))
       (set-param-type (rest objects) param))))
 
-(defn set-type-in-list [objects atom]
+(defn set-type-in-list [objects atom] 
   (assoc-in atom [:params] (map (partial set-param-type objects) (get-in atom [:params]))))
 
 (defn set-type-in-formula [objects formula]
   (cond
+    (empty? formula) '()
     (= 'and (get-in formula [:operator])) (assoc-in formula [:conjuncts] (map (partial set-type-in-formula objects) (get-in formula [:conjuncts])))
     (= 'not (get-in formula [:operator])) (assoc-in formula [:atom] (set-type-in-formula objects (get-in formula [:atom])))
     (map? formula) (assoc-in formula [:params] (map (partial set-param-type objects) (get-in formula [:params])))

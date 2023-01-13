@@ -26,7 +26,6 @@
     (= 'not (formula-old :operator)) {:operator 'not :atom (substitute-formula pairs (formula-old :atom))}
     :else {:operator 'atom :name (formula-old :name) :params (substitute-all-params pairs (formula-old :params))}))
 
-
 (defn substitute-precondition [action pairs]
   (let [formula-old ((action :action) :precondition)
         formula-new (substitute-formula pairs formula-old)]
