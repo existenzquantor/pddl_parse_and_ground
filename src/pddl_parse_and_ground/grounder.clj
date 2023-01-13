@@ -12,7 +12,7 @@
 (defn substitute-match [pairs param]
   (let [pair (first pairs)]
     (cond
-      (empty? pairs) param
+      (empty? pairs) nil
       (= (param :sort) 'const) param
       (= ((first pair) :symbol) (param :symbol)) (second pair)
       :else (substitute-match (rest pairs) param))))

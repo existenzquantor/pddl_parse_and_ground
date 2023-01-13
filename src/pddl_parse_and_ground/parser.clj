@@ -1,4 +1,3 @@
-
 (ns pddl-parse-and-ground.parser)
 
 ; Parse Domain Name
@@ -128,7 +127,44 @@
    :init (get-problem-initial-state problem)
    :goal (get-problem-goal problem)})
 
+(defn set-param-type [objects param]
+  (let [object (first objects)]
+    (if (= (get-in object [:symbol]) (get-in param [:symbol]))
+      (assoc-in param [:type] (get-in object [:type]))
+      (set-param-type (rest objects) param))))
+
+(defn set-type-in-list [objects atom]
+  (map (partial set-param-type objects) (get-in atom [:params])))
+
+(defn set-type-in-formula [objects formula]
+  (cond
+    (= 'and (get-in formula [:operator])) (assoc-in formula [:conjuncts] (map (partial set-type-in-formula objects) (get-in formula [:conjuncts])))
+    (= 'not (get-in formula [:operator])) (assoc-in formula [:atom] (set-type-in-formula objects (get-in formula [:atom])))
+    (map? formula) (assoc-in formula [:params] (map (partial set-param-type objects) (get-in formula [:params])))
+    :else (assoc-in formula [:params] (set-type-in-list objects (get-in formula [:params])))))
+
+(defn infer-types-in-actions [objects action]
+  (let [objects2 (concat objects (get-in action [:action :parameters]))
+        act1 (assoc-in action [:action :precondition] (set-type-in-formula objects2 (get-in action [:action :precondition])))
+        act2 (assoc-in act1 [:action :effect] (set-type-in-formula objects2 (get-in act1 [:action :effect])))]
+    act2))
+
+(defn infer-types [domprob]
+  (let [objects (get-in domprob [:PDDLProblem :objects])
+        problem (get-in domprob [:PDDLProblem])
+        domain (get-in domprob [:PDDLDomain])]
+    {:PDDLDomain {:name (get-in domain [:name])
+                  :predicates (get-in domain [:predicates])
+                  :actions (map (partial infer-types-in-actions objects) (get-in domain [:actions]))
+                  :grounding nil}
+     :PDDLProblem {:name (get-in problem [:name])
+                   :domain (get-in problem [:domain])
+                   :objects (get-in problem [:objects])
+                   :init (flatten (map (partial set-type-in-list objects) (get-in problem [:init])))
+                   :goal (set-type-in-formula objects (get-in problem [:goal]))}}))
+    
 
 (defn parse-domain-and-problem [dom prob]
-  {:PDDLDomain (-> dom domain get-domain-as-map)
-   :PDDLProblem (-> prob problem get-problem-as-map)})
+  (let [domprob {:PDDLDomain (get-domain-as-map (domain dom))
+                 :PDDLProblem (get-problem-as-map (problem prob))}]
+    (infer-types domprob)))
