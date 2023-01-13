@@ -152,7 +152,6 @@
   (let [objects (get-in domprob [:PDDLProblem :objects])
         problem (get-in domprob [:PDDLProblem])
         domain (get-in domprob [:PDDLDomain])]
-    (println "(get-in problem [:init])): " (get-in problem [:init]))
     {:PDDLDomain {:name (get-in domain [:name])
                   :predicates (get-in domain [:predicates])
                   :actions (map (partial infer-types-in-actions objects) (get-in domain [:actions]))
