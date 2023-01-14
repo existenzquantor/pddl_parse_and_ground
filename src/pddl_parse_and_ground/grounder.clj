@@ -82,8 +82,8 @@
   (cond
     (empty? formula) nil
     (= 'and (formula :operator)) (map extract-atoms (formula :conjuncts))
-    (= 'not (formula :operator)) (formula :atom)
-    :else formula))
+    (= 'not (formula :operator)) (list (formula :atom))
+    :else (list formula)))
 
 (defn extract-all-atoms [action]
   (concat (extract-atoms ((action :action) :precondition)) (extract-atoms ((action :action) :effect))))
