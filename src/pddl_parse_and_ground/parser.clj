@@ -20,7 +20,7 @@
         (symbols->map (rest (rest (rest vars))) (concat return (list {:symbol var :sort 'var :type type}))))
       (let [var (first vars)]
         (if (and (symbol? var) (not (= '\? (get (str var) 0))))
-          (symbols->map (rest vars) (conj return {:symbol var :sort 'const :type nil}))
+          (symbols->map (rest vars) (concat return (list {:symbol var :sort 'const :type nil})))
         (symbols->map (rest vars) (concat return (list {:symbol var :sort 'var :type nil}))))))))
 
 ; Parse Predicates
@@ -55,11 +55,11 @@
   (if (empty? domain)
     action_list
     (if (and (list? (first domain)) (= ':action (first (first domain))))
-      (get-domain-actions (rest domain) (conj action_list {:action
-                                                           {:name (second (first domain))
-                                                            :parameters (symbols->map (nth (first domain) 3) '())
-                                                            :precondition (get-action-precondition (nth (first domain) 5))
-                                                            :effect (get_action_effect (nth (first domain) 7))}}))
+      (get-domain-actions (rest domain) (concat action_list (list {:action
+                                                                   {:name (second (first domain))
+                                                                    :parameters (symbols->map (nth (first domain) 3) '())
+                                                                    :precondition (get-action-precondition (nth (first domain) 5))
+                                                                    :effect (get_action_effect (nth (first domain) 7))}})))
       (get-domain-actions (rest domain) action_list))))
 
 ; Parse Domain
@@ -93,7 +93,7 @@
     return
     (if (= '- (first objects))
       (get-problem-objects-recur (rest (rest objects)) return)
-      (get-problem-objects-recur (rest objects) (conj return {:symbol (first objects) :sort 'const :type (lookup-type (first objects) objects)})))))
+      (get-problem-objects-recur (rest objects) (concat return (list {:symbol (first objects) :sort 'const :type (lookup-type (first objects) objects)}))))))
 
 (defn get-problem-objects [problem]
   (if (empty? problem)
