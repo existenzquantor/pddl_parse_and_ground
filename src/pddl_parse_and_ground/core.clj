@@ -5,7 +5,7 @@
   (:gen-class))
 
 
-(defn parse_and_ground [domain problem]
+(defn parse-and-ground [domain problem]
   (let [parsed (parser/parse-domain-and-problem domain problem)
         with-grounded-actions (assoc-in parsed [:PDDLDomain :grounding :actions] (grounder/ground-all-actions parsed))
         with-grounded-predicates (assoc-in with-grounded-actions [:PDDLDomain :grounding :predicates] (grounder/ground-relevant-predicates with-grounded-actions))]
@@ -13,4 +13,4 @@
 
 
 (defn -main [& args]
-  (json/pprint (parse_and_ground (first args) (second args))))    
+  (json/pprint (parse-and-ground (first args) (second args))))    
