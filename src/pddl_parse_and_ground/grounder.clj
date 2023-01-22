@@ -3,11 +3,11 @@
   (:require [clojure.string]))
 
 (defn get-arity [action]
-  (count ((action :action) :parameters)))
+  (count (action :parameters)))
 
 (defn substitute-parameters [action pairs]
   (let [new-params (map second pairs)]
-    (assoc-in action [:action :parameters] new-params)))
+    (assoc-in action [:parameters] new-params)))
 
 (defn substitute-match [pairs param]
   (let [pair (first pairs)]
@@ -27,17 +27,17 @@
     :else {:operator 'atom :name (formula-old :name) :params (substitute-all-params pairs (formula-old :params))}))
 
 (defn substitute-precondition [action pairs]
-  (let [formula-old ((action :action) :precondition)
+  (let [formula-old (action :precondition)
         formula-new (substitute-formula pairs formula-old)]
-    (assoc-in action [:action :precondition] formula-new)))
+    (assoc-in action [:precondition] formula-new)))
 
 (defn substitute-effect [action pairs]
-  (let [formula-old ((action :action) :effect)
+  (let [formula-old (action :effect)
         formula-new (substitute-formula pairs formula-old)]
-    (assoc-in action [:action :effect] formula-new)))
+    (assoc-in action [:effect] formula-new)))
 
 (defn substitute [action pairs]
-  (if (> (count ((action :action) :parameters)) 0)
+  (if (> (count (action :parameters)) 0)
     (substitute-effect (substitute-precondition (substitute-parameters action pairs) pairs) pairs)
   action))
 
@@ -45,7 +45,7 @@
   (= (get (first pair) :type) (get (second pair) :type)))
 
 (defn action->grounding [action selection]
-  (let [pairs (map list ((action :action) :parameters) selection)
+  (let [pairs (map list (action :parameters) selection)
         valid? (every? valid-pair? pairs)]
     (if valid? (substitute action pairs) nil)))
 
@@ -58,8 +58,8 @@
         (inconsistent-set? all-atoms (rest negated-atoms))))))
       
 (defn inconsistent? [action]
-  (if (= 'and (((action :action) :effect) :operator))
-    (inconsistent-set? (((action :action) :effect) :conjuncts) (filter #(= 'not (% :operator)) (((action :action) :effect) :conjuncts)))
+  (if (= 'and ((action :effect) :operator))
+    (inconsistent-set? ((action :effect) :conjuncts) (filter #(= 'not (% :operator)) ((action :effect) :conjuncts)))
     false
     ))
 
@@ -86,7 +86,7 @@
     :else (list formula)))
 
 (defn extract-all-atoms [action]
-  (concat (extract-atoms ((action :action) :precondition)) (extract-atoms ((action :action) :effect))))
+  (concat (extract-atoms (action :precondition)) (extract-atoms (action :effect))))
 
 (defn ground-relevant-predicates [domprob]
   (let [actions (((domprob :PDDLDomain) :grounding) :actions)

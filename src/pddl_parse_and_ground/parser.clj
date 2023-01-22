@@ -11,7 +11,7 @@
 (defn in? [coll elm]
   (some #(= elm %) coll))
 
-(defn symbols->map [vars return] 
+(defn symbols->map [vars return]
   (if (empty? vars)
     return
     (if (in? vars '-)
@@ -21,7 +21,7 @@
       (let [var (first vars)]
         (if (and (symbol? var) (not (= '\? (get (str var) 0))))
           (symbols->map (rest vars) (concat return (list {:symbol var :sort 'const :type nil})))
-        (symbols->map (rest vars) (concat return (list {:symbol var :sort 'var :type nil}))))))))
+          (symbols->map (rest vars) (concat return (list {:symbol var :sort 'var :type nil}))))))))
 
 ; Parse Predicates
 (defn make-predicate [pred]
@@ -55,11 +55,10 @@
   (if (empty? domain)
     action_list
     (if (and (list? (first domain)) (= ':action (first (first domain))))
-      (get-domain-actions (rest domain) (concat action_list (list {:action
-                                                                   {:name (second (first domain))
-                                                                    :parameters (symbols->map (nth (first domain) 3) '())
-                                                                    :precondition (get-action-precondition (nth (first domain) 5))
-                                                                    :effect (get_action_effect (nth (first domain) 7))}})))
+      (get-domain-actions (rest domain) (concat action_list (list {:name (second (first domain))
+                                                                   :parameters (symbols->map (nth (first domain) 3) '())
+                                                                   :precondition (get-action-precondition (nth (first domain) 5))
+                                                                   :effect (get_action_effect (nth (first domain) 7))})))
       (get-domain-actions (rest domain) action_list))))
 
 ; Parse Domain
@@ -132,7 +131,7 @@
       (assoc-in param [:type] (get-in object [:type]))
       (set-param-type (rest objects) param))))
 
-(defn set-type-in-list [objects atom] 
+(defn set-type-in-list [objects atom]
   (assoc-in atom [:params] (map (partial set-param-type objects) (get-in atom [:params]))))
 
 (defn set-type-in-formula [objects formula]
@@ -144,9 +143,9 @@
     :else (assoc-in formula [:params] (set-type-in-list objects (get-in formula [:params])))))
 
 (defn infer-types-in-actions [objects action]
-  (let [objects2 (concat objects (get-in action [:action :parameters]))
-        act1 (assoc-in action [:action :precondition] (set-type-in-formula objects2 (get-in action [:action :precondition])))
-        act2 (assoc-in act1 [:action :effect] (set-type-in-formula objects2 (get-in act1 [:action :effect])))]
+  (let [objects2 (concat objects (get-in action [:parameters]))
+        act1 (assoc-in action [:precondition] (set-type-in-formula objects2 (get-in action [:precondition])))
+        act2 (assoc-in act1 [:effect] (set-type-in-formula objects2 (get-in act1 [:effect])))]
     act2))
 
 (defn infer-types [domprob]
@@ -162,7 +161,7 @@
                    :objects (get-in problem [:objects])
                    :init (flatten (map (partial set-type-in-list objects) (get-in problem [:init])))
                    :goal (set-type-in-formula objects (get-in problem [:goal]))}}))
-    
+
 
 (defn parse-domain-and-problem [dom prob]
   (let [domprob {:PDDLDomain (get-domain-as-map (domain dom))
